@@ -1,75 +1,91 @@
 <!doctype html>
 <html>
     <head>
-        <meta http-equiv="content-type" content="text/html; charset=utf-8">
         <title>Tic Tac Toe</title>
-        <link rel="stylesheet" href="game.css" type="text/css" media="screen" charset="utf-8">
+        <style>
+          table {
+            border-collapse: collapse;
+            width: 300px;
+            height: 300px;
+            text-align: center;
+          }
+
+          td {
+            width: 100px;
+            height: 100px;
+          }
+
+          table, td, th {
+            border: 1px solid black;
+          }
+        </style>
+        <script  type="text/javascript">
+        var gameStatus1;
+
+        function cellClicked(tr) {
+            if (!gameStatus1) {
+               gameStatus1 = "inProgress";
+            }
+            document.getElementById(tr.id).innerHTML = "X";
+            var url = 'http://localhost:8081/play';
+            var cells = [];
+            var tds = document.getElementsByTagName("TD");
+            for(var i = 0; i < tds.length; i++) {
+              var value = null;
+              if (tds[i].innerHTML != "") {
+                value = tds[i].innerHTML;
+              }
+              const cell = {
+                position: tds[i].id,
+                value: value,
+              };
+              cells.push(cell);
+            }
+            const data = {
+              cells: cells,
+              gameStatus: gameStatus1,
+            };
+            console.log(JSON.stringify(data));
+            const param = {
+              body: JSON.stringify(data),
+              method: "POST",
+              mode: "no-cors"
+            };
+            fetch(url, param)
+              .then( data => {
+                console.log(data);
+                if (data["gameStatus"] == "inProgress") {
+                  data["cells"].forEach((cell) => {
+                    if (cell.value) {
+                        document.getElementById(cell.position).innerHTML = cell.value;
+                    }
+                  });
+                } else {
+                  alert(data["gameStatus"]);
+                }
+              });
+        }
+        </script>
     </head>
 
     <body>
         <h1>Tic Tac Toe</h1>
         <table id="board" class="board">
             <tr>
-                <td id="one" class="even"></td>
-                <td id="two"></td>
-                <td id="three" class="even"></td>
+                <td id="0,0" onclick="cellClicked(this)"></td>
+                <td id="0,1" onclick="cellClicked(this)"></td>
+                <td id="0,2" onclick="cellClicked(this)"></td>
             </tr>
             <tr>
-                <td id="four"></td>
-                <td id="five" class="even"></td>
-                <td id="six"></td>
+                <td id="1,0" onclick="cellClicked(this)"></td>
+                <td id="1,1" onclick="cellClicked(this)"></td>
+                <td id="1,2" onclick="cellClicked(this)"></td>
             </tr>
             <tr>
-                <td id="seven" class="even"></td>
-                <td id="eight"></td>
-                <td id="nine" class="even"></td>
+                <td id="2,0" onclick="cellClicked(this)"></td>
+                <td id="2,1" onclick="cellClicked(this)"></td>
+                <td id="2,2" onclick="cellClicked(this)"></td>
             </tr>
         </table>
-
-        <table id="anotherBoard" class="board">
-            <tr>
-                <td id="one" class="even"></td>
-                <td id="two"></td>
-                <td id="three" class="even"></td>
-            </tr>
-            <tr>
-                <td id="four"></td>
-                <td id="five" class="even"></td>
-                <td id="six"></td>
-            </tr>
-            <tr>
-                <td id="seven" class="even"></td>
-                <td id="eight"></td>
-                <td id="nine" class="even"></td>
-            </tr>
-        </table>
-
-        <table id="thirdBoard" class="board">
-            <tr>
-                <td id="one" class="even"></td>
-                <td id="two"></td>
-                <td id="three" class="even"></td>
-            </tr>
-            <tr>
-                <td id="four"></td>
-                <td id="five" class="even"></td>
-                <td id="six"></td>
-            </tr>
-            <tr>
-                <td id="seven" class="even"></td>
-                <td id="eight"></td>
-                <td id="nine" class="even"></td>
-            </tr>
-        </table>
-        <script src="http://code.jquery.com/jquery-1.5.1.js" type="text/javascript" charset="utf-8"></script>
-        <script src="jquery.tictac.js" type="text/javascript" charset="utf-8"></script>
-        <script type="text/javascript" charset="utf-8">
-            $(function() {
-                $("#board, #anotherBoard").tictac().css("border", "1px solid #CC0000");
-                //$("#anotherBoard").tictac().css("border", "1px solid #00CC00");
-                var thirdBoard = $("#thirdBoard").tictac();
-                thirdBoard.css("border", "1px solid #0000CC");
-            });
-        </script>
     </body>
 </html>
